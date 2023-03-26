@@ -43,23 +43,53 @@ public class Main {
                             dp[EMPTY_HAND][i] = getMinTime(dp, i - 1) + 2;
                         //qualquer que seja o item que tenhamos na mao, vamos sempre fazer isto
                     } else {
+                        if(currPlot == 'e'){
+                            if (dp[HARP_HAND][i - 1] != maxValue && dp[HARP_HAND][i - 1] != 0)
+                                dp[HARP_HAND][i] = dp[HARP_HAND][i - 1] + 3;
+
+                            if (dp[POTION_HAND][i - 1] != maxValue && dp[POTION_HAND][i - 1] != 0)
+                                dp[POTION_HAND][i] = dp[POTION_HAND][i - 1] + 3;
+
+                            if (dp[CLOAK_HAND][i - 1] != maxValue && dp[CLOAK_HAND][i - 1] != 0)
+                                dp[CLOAK_HAND][i] = dp[CLOAK_HAND][i - 1] + 3;
+                        }
                         if (currPlot == 'h') {
                             if (dp[HARP_HAND][i - 1] != maxValue && dp[HARP_HAND][i - 1] != 0)
                                 dp[HARP_HAND][i] = dp[HARP_HAND][i - 1] + 3;
                             else
                                 dp[HARP_HAND][i] = getMinTime(dp, i - 1) + 2;
+
+                            if (dp[POTION_HAND][i - 1] != maxValue && dp[POTION_HAND][i - 1] != 0)
+                                dp[POTION_HAND][i] = dp[POTION_HAND][i - 1] + 3;
+
+                            if (dp[CLOAK_HAND][i - 1] != maxValue && dp[CLOAK_HAND][i - 1] != 0)
+                                dp[CLOAK_HAND][i] = dp[CLOAK_HAND][i - 1] + 3;
+
+
                         }
                         if (currPlot == 'p') {
                             if (dp[POTION_HAND][i - 1] != maxValue && dp[POTION_HAND][i - 1] != 0)
                                 dp[POTION_HAND][i] = dp[POTION_HAND][i - 1] + 3;
                             else
                                 dp[POTION_HAND][i] = getMinTime(dp, i - 1) + 2;
+
+                            if (dp[HARP_HAND][i - 1] != maxValue && dp[HARP_HAND][i - 1] != 0)
+                                dp[HARP_HAND][i] = dp[HARP_HAND][i - 1] + 3;
+
+                            if (dp[CLOAK_HAND][i - 1] != maxValue && dp[CLOAK_HAND][i - 1] != 0)
+                                dp[CLOAK_HAND][i] = dp[CLOAK_HAND][i - 1] + 3;
                         }
                         if (currPlot == 'c') {
                             if (dp[CLOAK_HAND][i - 1] != maxValue && dp[CLOAK_HAND][i - 1] != 0)
                                 dp[CLOAK_HAND][i] = dp[CLOAK_HAND][i - 1] + 3;
                             else
                                 dp[CLOAK_HAND][i] = getMinTime(dp, i - 1) + 2;
+
+                            if (dp[HARP_HAND][i - 1] != maxValue && dp[HARP_HAND][i - 1] != 0)
+                                dp[HARP_HAND][i] = dp[HARP_HAND][i - 1] + 3;
+
+                            if (dp[POTION_HAND][i - 1] != maxValue && dp[POTION_HAND][i - 1] != 0)
+                                dp[POTION_HAND][i] = dp[POTION_HAND][i - 1] + 3;
                         }
                     }
                 } else if (currPlot == '3' || currPlot == 't' || currPlot == 'd') {
@@ -97,7 +127,8 @@ public class Main {
                 }
             }
         }
-        printMatrix(dp);
+        //printMatrix(dp);
+       System.out.println(getMinTime(dp,n));
     }
 
 
