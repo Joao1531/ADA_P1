@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 
@@ -15,19 +16,31 @@ public class Main {
 
 
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
+        int tests = Integer.parseInt(in.readLine());
 
 
-        //int tests = Integer.parseInt(in.readLine()); usar para efetuar o numero de testes pedido.
-        String route = in.readLine();
-        int n = route.length();
-        int[][] dp = new int[5][n + 1]; // o 3 representa as possibilidades que ha de passar em cada plot. Sem objeto (0),
-        String aux = route + " ";
-        char[] form = aux.toCharArray();
-        // com intuito de apanhar um objeto caso nao tenha ou de dropar um (1),
-        // ou de passar já com objeto e ignorra o que há (2)
         int maxValue = Integer.MAX_VALUE; // Preencher a matriz com o maior numero possivel.
-        fillDP(dp, maxValue);
 
+        ArrayList<Integer> testResults = new ArrayList<>();
+        printResults(in,testResults,tests,maxValue);
+
+    }
+
+    private static void printResults(BufferedReader in,ArrayList<Integer> testResults,int tests,int maxValue ) throws IOException {
+
+        for ( int i = 0; i < tests ; i++){
+            String route = in.readLine();
+            int n = route.length();
+            int[][] dp = new int[5][n + 1];
+            fillDP(dp, maxValue);
+            calculateResults(route,n,dp,maxValue);
+            testResults.add(getMinTime(dp, n));
+        }
+        for (int i : testResults)
+            System.out.println(i);
+    }
+
+    private static void calculateResults(String route,int n,int [][] dp,int maxValue ){
         for (int i = 1; i <= n; i++) {
             //pode dar problemas quando ha 1 plot apenas
 
@@ -93,8 +106,6 @@ public class Main {
                 }
             }
         }
-        //printMatrix(dp);
-        System.out.println(getMinTime(dp, n));
     }
 
 
@@ -146,30 +157,14 @@ public class Main {
 
 
     }
-
+ //Por usar
     private static void updateMonsterDP(int[][] dp, int[] object, int index, int maxValue) {
         if (dp[object[0]][index - 1] != maxValue)
             dp[object[0]][index] = dp[object[0]][index - 1] + object[1];
     }
 
-    public static void printMatrix(int[][] dp) {
 
-// print the matrix in a square shape
-        for (int i = 0; i < dp.length; i++) {
-            for (int j = 0; j < dp[0].length; j++) {
-                System.out.print(dp[i][j] + " ");
-            }
-            System.out.println(); // move to the next line after each row
-        }
-    }
 
-    private static boolean isBagEmpty(int[][] dp) {
-        boolean tmp = true;
-        for (int i = 2; i < dp[0].length; i++) {
-            if (dp[1][1] < dp[1][i])
-                tmp = false;
-        }
-        return tmp;
-    }
+
 
 }
