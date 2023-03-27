@@ -5,10 +5,11 @@ import java.util.Arrays;
 
 
 public class Main {
-    private static final int EMPTY_HAND = 1;
-    private static final int HARP_HAND = 2;
-    private static final int POTION_HAND = 3;
-    private static final int CLOAK_HAND = 4;
+    private static final int[] EMPTY_HAND = {1, Integer.MAX_VALUE};
+    private static final int[] HARP_HAND = {2, 4};
+    private static final int[] POTION_HAND = {3, 5};
+    private static final int[] CLOAK_HAND = {4, 6};
+
 
     public static void main(String[] args) throws IOException {
 
@@ -20,6 +21,8 @@ public class Main {
         String route = in.readLine();
         int n = route.length();
         int[][] dp = new int[5][n + 1]; // o 3 representa as possibilidades que ha de passar em cada plot. Sem objeto (0),
+        String aux = route + " ";
+        char[] form = aux.toCharArray();
         // com intuito de apanhar um objeto caso nao tenha ou de dropar um (1),
         // ou de passar já com objeto e ignorra o que há (2)
         int maxValue = Integer.MAX_VALUE; // Preencher a matriz com o maior numero possivel.
@@ -32,103 +35,66 @@ public class Main {
             char currPlot = route.charAt(i - 1);
 
             for (int j = 1; j < 5; j++) { //atencao ao <= pode dar erro
-                //case 1: if we are in an easy(empty)-plot or item plot
                 if (currPlot == 'e' || currPlot == 'h' || currPlot == 'p' || currPlot == 'c') {
-                    //if we are empty handed
-                    if (j == EMPTY_HAND) {
-                        if (dp[EMPTY_HAND][i - 1] != maxValue)
-                            dp[EMPTY_HAND][i] = dp[EMPTY_HAND][i - 1] + 1;
-                            //get the minimum and ADD 1 as we "dropped the item"
-                        else
-                            dp[EMPTY_HAND][i] = getMinTime(dp, i - 1) + 2;
-                        //qualquer que seja o item que tenhamos na mao, vamos sempre fazer isto
-                    } else {
-                        if(currPlot == 'e'){
-                            if (dp[HARP_HAND][i - 1] != maxValue && dp[HARP_HAND][i - 1] != 0)
-                                dp[HARP_HAND][i] = dp[HARP_HAND][i - 1] + 3;
+                    updateEmptyHandDP(dp, i, maxValue);
+                    if (currPlot == 'e') {
+                        updateDP(dp, HARP_HAND[0], i, maxValue);
+                        updateDP(dp, POTION_HAND[0], i, maxValue);
+                        updateDP(dp, CLOAK_HAND[0], i, maxValue);
 
-                            if (dp[POTION_HAND][i - 1] != maxValue && dp[POTION_HAND][i - 1] != 0)
-                                dp[POTION_HAND][i] = dp[POTION_HAND][i - 1] + 3;
-
-                            if (dp[CLOAK_HAND][i - 1] != maxValue && dp[CLOAK_HAND][i - 1] != 0)
-                                dp[CLOAK_HAND][i] = dp[CLOAK_HAND][i - 1] + 3;
-                        }
-                        if (currPlot == 'h') {
-                            if (dp[HARP_HAND][i - 1] != maxValue && dp[HARP_HAND][i - 1] != 0)
-                                dp[HARP_HAND][i] = dp[HARP_HAND][i - 1] + 3;
-                            else
-                                dp[HARP_HAND][i] = getMinTime(dp, i - 1) + 2;
-
-                            if (dp[POTION_HAND][i - 1] != maxValue && dp[POTION_HAND][i - 1] != 0)
-                                dp[POTION_HAND][i] = dp[POTION_HAND][i - 1] + 3;
-
-                            if (dp[CLOAK_HAND][i - 1] != maxValue && dp[CLOAK_HAND][i - 1] != 0)
-                                dp[CLOAK_HAND][i] = dp[CLOAK_HAND][i - 1] + 3;
-
-
-                        }
-                        if (currPlot == 'p') {
-                            if (dp[POTION_HAND][i - 1] != maxValue && dp[POTION_HAND][i - 1] != 0)
-                                dp[POTION_HAND][i] = dp[POTION_HAND][i - 1] + 3;
-                            else
-                                dp[POTION_HAND][i] = getMinTime(dp, i - 1) + 2;
-
-                            if (dp[HARP_HAND][i - 1] != maxValue && dp[HARP_HAND][i - 1] != 0)
-                                dp[HARP_HAND][i] = dp[HARP_HAND][i - 1] + 3;
-
-                            if (dp[CLOAK_HAND][i - 1] != maxValue && dp[CLOAK_HAND][i - 1] != 0)
-                                dp[CLOAK_HAND][i] = dp[CLOAK_HAND][i - 1] + 3;
-                        }
-                        if (currPlot == 'c') {
-                            if (dp[CLOAK_HAND][i - 1] != maxValue && dp[CLOAK_HAND][i - 1] != 0)
-                                dp[CLOAK_HAND][i] = dp[CLOAK_HAND][i - 1] + 3;
-                            else
-                                dp[CLOAK_HAND][i] = getMinTime(dp, i - 1) + 2;
-
-                            if (dp[HARP_HAND][i - 1] != maxValue && dp[HARP_HAND][i - 1] != 0)
-                                dp[HARP_HAND][i] = dp[HARP_HAND][i - 1] + 3;
-
-                            if (dp[POTION_HAND][i - 1] != maxValue && dp[POTION_HAND][i - 1] != 0)
-                                dp[POTION_HAND][i] = dp[POTION_HAND][i - 1] + 3;
-                        }
                     }
+                    if (currPlot == 'h') {
+                        updateMatchingDP(dp, HARP_HAND[0], i, maxValue);
+                        updateDP(dp, POTION_HAND[0], i, maxValue);
+                        updateDP(dp, CLOAK_HAND[0], i, maxValue);
+
+                    }
+                    if (currPlot == 'p') {
+                        updateMatchingDP(dp, POTION_HAND[0], i, maxValue );
+                        updateDP(dp, HARP_HAND[0], i, maxValue);
+                        updateDP(dp, CLOAK_HAND[0], i, maxValue);
+                    }
+                    if (currPlot == 'c') {
+                        updateMatchingDP(dp, CLOAK_HAND[0], i, maxValue);
+                        updateDP(dp, HARP_HAND[0], i, maxValue);
+                        updateDP(dp, POTION_HAND[0], i, maxValue);
+                    }
+
                 } else if (currPlot == '3' || currPlot == 't' || currPlot == 'd') {
-                    //pode faltar o empty
+
                     if (currPlot == '3') {
-                        if (j == HARP_HAND) {
-                            if (dp[HARP_HAND][i - 1] != maxValue)
-                                dp[HARP_HAND][i] = dp[HARP_HAND][i - 1] + 4;
-                        } else if (j == POTION_HAND) {
-                            if (dp[POTION_HAND][i - 1] != maxValue)
-                                dp[POTION_HAND][i] = dp[POTION_HAND][i - 1] + 5;
-                        } else if (j == CLOAK_HAND) {
-                            if (dp[CLOAK_HAND][i - 1] != maxValue)
-                                dp[CLOAK_HAND][i] = dp[CLOAK_HAND][i - 1] + 6;
+                        if (j == HARP_HAND[0]) {
+                            if (dp[HARP_HAND[0]][i - 1] != maxValue && dp[HARP_HAND[0]][i - 1] != 0)
+                                dp[HARP_HAND[0]][i] = dp[HARP_HAND[0]][i - 1] + 4;
+                        } else if (j == POTION_HAND[0]) {
+                            if (dp[POTION_HAND[0]][i - 1] != maxValue && dp[POTION_HAND[0]][i - 1] != 0)
+                                dp[POTION_HAND[0]][i] = dp[POTION_HAND[0]][i - 1] + 5;
+                        } else if (j == CLOAK_HAND[0]) {
+                            if (dp[CLOAK_HAND[0]][i - 1] != maxValue && dp[CLOAK_HAND[0]][i - 1] != 0)
+                                dp[CLOAK_HAND[0]][i] = dp[CLOAK_HAND[0]][i - 1] + 6;
                         }
                     }
                     if (currPlot == 't') {
-                        //pode faltar o harp
-                        if (j == POTION_HAND) {
-                            if (dp[POTION_HAND][i - 1] != maxValue)
-                                dp[POTION_HAND][i] = dp[POTION_HAND][i - 1] + 5;
-                        } else if (j == CLOAK_HAND) {
-                            if (dp[CLOAK_HAND][i - 1] != maxValue)
-                                dp[CLOAK_HAND][i] = dp[CLOAK_HAND][i - 1] + 6;
+                        if (j == POTION_HAND[0]) {
+                            if (dp[POTION_HAND[0]][i - 1] != maxValue && dp[POTION_HAND[0]][i - 1] != 0)
+                                dp[POTION_HAND[0]][i] = dp[POTION_HAND[0]][i - 1] + 5;
+                        } else if (j == CLOAK_HAND[0]) {
+                            if (dp[CLOAK_HAND[0]][i - 1] != maxValue && dp[CLOAK_HAND[0]][i - 1] != 0)
+                                dp[CLOAK_HAND[0]][i] = dp[CLOAK_HAND[0]][i - 1] + 6;
                         }
 
                     }
                     if (currPlot == 'd') {
-                        //pode faltar o harp e talvez o potion
-                        if (j == CLOAK_HAND) {
-                            if (dp[CLOAK_HAND][i - 1] != maxValue)
-                                dp[CLOAK_HAND][i] = dp[CLOAK_HAND][i - 1] + 6;
+                        if (j == CLOAK_HAND[0]) {
+                            if (dp[CLOAK_HAND[0]][i - 1] != maxValue && dp[CLOAK_HAND[0]][i - 1] != 0)
+                                dp[CLOAK_HAND[0]][i] = dp[CLOAK_HAND[0]][i - 1] + 6;
                         }
                     }
                 }
             }
         }
         //printMatrix(dp);
-       System.out.println(getMinTime(dp,n));
+        System.out.println(getMinTime(dp, n));
     }
 
 
@@ -154,12 +120,56 @@ public class Main {
         return minTime;
     }
 
-    public static void printMatrix (int [][]dp ){
-        for (int i = 0 ; i < dp.length ; i++ ){
-            for (int j = 0 ; j < dp[i].length ; j++ ){
-                System.out.println(dp[i][j] + " ");
+    private static void updateEmptyHandDP(int[][] dp, int index, int maxValue) {
+        if (dp[EMPTY_HAND[0]][index - 1] != maxValue)
+            dp[EMPTY_HAND[0]][index] = dp[EMPTY_HAND[0]][index - 1] + 1;
+            //get the minimum and ADD 1 as we "dropped the item"
+        else
+            dp[EMPTY_HAND[0]][index] = getMinTime(dp, index - 1) + 2;
+    }
+
+    private static void updateDP(int[][] dp, int object, int index, int maxValue) {
+        if (dp[object][index - 1] != maxValue && dp[object][index - 1] != 0)
+            dp[object][index] = dp[object][index - 1] + 3;
+    }
+
+    //este esta a falhar.. TRATAR
+    private static void updateMatchingDP(int[][] dp, int object, int index, int maxValue) {
+       // System.out.println("MINTIME " + getMinTime(dp,index-1) + " " + dp[object][index]);
+        if(dp[EMPTY_HAND[0]][index-1] == getMinTime(dp,index-1) )
+            if(dp[EMPTY_HAND[0]][index-1] == maxValue)
+                dp[object][index] = 2;
+            else
+                dp[object][index] = getMinTime(dp,index-1) + 2;
+        else
+            dp[object][index] = getMinTime(dp,index-1) + 3;
+
+
+    }
+
+    private static void updateMonsterDP(int[][] dp, int[] object, int index, int maxValue) {
+        if (dp[object[0]][index - 1] != maxValue)
+            dp[object[0]][index] = dp[object[0]][index - 1] + object[1];
+    }
+
+    public static void printMatrix(int[][] dp) {
+
+// print the matrix in a square shape
+        for (int i = 0; i < dp.length; i++) {
+            for (int j = 0; j < dp[0].length; j++) {
+                System.out.print(dp[i][j] + " ");
             }
-            System.out.println();
+            System.out.println(); // move to the next line after each row
         }
     }
+
+    private static boolean isBagEmpty(int[][] dp) {
+        boolean tmp = true;
+        for (int i = 2; i < dp[0].length; i++) {
+            if (dp[1][1] < dp[1][i])
+                tmp = false;
+        }
+        return tmp;
+    }
+
 }
