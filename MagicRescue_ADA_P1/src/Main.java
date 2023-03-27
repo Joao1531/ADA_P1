@@ -18,29 +18,28 @@ public class Main {
         BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
         int tests = Integer.parseInt(in.readLine());
 
-
         int maxValue = Integer.MAX_VALUE; // Preencher a matriz com o maior numero possivel.
 
         ArrayList<Integer> testResults = new ArrayList<>();
-        printResults(in,testResults,tests,maxValue);
+        printResults(in, testResults, tests, maxValue);
 
     }
 
-    private static void printResults(BufferedReader in,ArrayList<Integer> testResults,int tests,int maxValue ) throws IOException {
+    private static void printResults(BufferedReader in, ArrayList<Integer> testResults, int tests, int maxValue) throws IOException {
 
-        for ( int i = 0; i < tests ; i++){
+        for (int i = 0; i < tests; i++) {
             String route = in.readLine();
             int n = route.length();
             int[][] dp = new int[5][n + 1];
             fillDP(dp, maxValue);
-            calculateResults(route,n,dp,maxValue);
+            calculateResults(route, n, dp, maxValue);
             testResults.add(getMinTime(dp, n));
         }
         for (int i : testResults)
             System.out.println(i);
     }
 
-    private static void calculateResults(String route,int n,int [][] dp,int maxValue ){
+    private static void calculateResults(String route, int n, int[][] dp, int maxValue) {
         for (int i = 1; i <= n; i++) {
             //pode dar problemas quando ha 1 plot apenas
 
@@ -63,7 +62,7 @@ public class Main {
 
                     }
                     if (currPlot == 'p') {
-                        updateMatchingDP(dp, POTION_HAND[0], i, maxValue );
+                        updateMatchingDP(dp, POTION_HAND[0], i, maxValue);
                         updateDP(dp, HARP_HAND[0], i, maxValue);
                         updateDP(dp, CLOAK_HAND[0], i, maxValue);
                     }
@@ -77,30 +76,24 @@ public class Main {
 
                     if (currPlot == '3') {
                         if (j == HARP_HAND[0]) {
-                            if (dp[HARP_HAND[0]][i - 1] != maxValue && dp[HARP_HAND[0]][i - 1] != 0)
-                                dp[HARP_HAND[0]][i] = dp[HARP_HAND[0]][i - 1] + 4;
+                            updateMonsterDP(dp, HARP_HAND, i, maxValue);
                         } else if (j == POTION_HAND[0]) {
-                            if (dp[POTION_HAND[0]][i - 1] != maxValue && dp[POTION_HAND[0]][i - 1] != 0)
-                                dp[POTION_HAND[0]][i] = dp[POTION_HAND[0]][i - 1] + 5;
+                            updateMonsterDP(dp, POTION_HAND, i, maxValue);
                         } else if (j == CLOAK_HAND[0]) {
-                            if (dp[CLOAK_HAND[0]][i - 1] != maxValue && dp[CLOAK_HAND[0]][i - 1] != 0)
-                                dp[CLOAK_HAND[0]][i] = dp[CLOAK_HAND[0]][i - 1] + 6;
+                            updateMonsterDP(dp, CLOAK_HAND, i, maxValue);
                         }
                     }
                     if (currPlot == 't') {
                         if (j == POTION_HAND[0]) {
-                            if (dp[POTION_HAND[0]][i - 1] != maxValue && dp[POTION_HAND[0]][i - 1] != 0)
-                                dp[POTION_HAND[0]][i] = dp[POTION_HAND[0]][i - 1] + 5;
-                        } else if (j == CLOAK_HAND[0]) {
-                            if (dp[CLOAK_HAND[0]][i - 1] != maxValue && dp[CLOAK_HAND[0]][i - 1] != 0)
-                                dp[CLOAK_HAND[0]][i] = dp[CLOAK_HAND[0]][i - 1] + 6;
-                        }
+                            updateMonsterDP(dp, POTION_HAND, i, maxValue);
 
+                        } else if (j == CLOAK_HAND[0]) {
+                            updateMonsterDP(dp, CLOAK_HAND, i, maxValue);
+                        }
                     }
                     if (currPlot == 'd') {
                         if (j == CLOAK_HAND[0]) {
-                            if (dp[CLOAK_HAND[0]][i - 1] != maxValue && dp[CLOAK_HAND[0]][i - 1] != 0)
-                                dp[CLOAK_HAND[0]][i] = dp[CLOAK_HAND[0]][i - 1] + 6;
+                            updateMonsterDP(dp, CLOAK_HAND, i, maxValue);
                         }
                     }
                 }
@@ -146,25 +139,22 @@ public class Main {
 
     //este esta a falhar.. TRATAR
     private static void updateMatchingDP(int[][] dp, int object, int index, int maxValue) {
-       // System.out.println("MINTIME " + getMinTime(dp,index-1) + " " + dp[object][index]);
-        if(dp[EMPTY_HAND[0]][index-1] == getMinTime(dp,index-1) )
-            if(dp[EMPTY_HAND[0]][index-1] == maxValue)
+        // System.out.println("MINTIME " + getMinTime(dp,index-1) + " " + dp[object][index]);
+        if (dp[EMPTY_HAND[0]][index - 1] == getMinTime(dp, index - 1))
+            if (dp[EMPTY_HAND[0]][index - 1] == maxValue)
                 dp[object][index] = 2;
             else
-                dp[object][index] = getMinTime(dp,index-1) + 2;
+                dp[object][index] = getMinTime(dp, index - 1) + 2;
         else
-            dp[object][index] = getMinTime(dp,index-1) + 3;
+            dp[object][index] = getMinTime(dp, index - 1) + 3;
 
 
     }
- //Por usar
+
     private static void updateMonsterDP(int[][] dp, int[] object, int index, int maxValue) {
         if (dp[object[0]][index - 1] != maxValue)
             dp[object[0]][index] = dp[object[0]][index - 1] + object[1];
     }
-
-
-
 
 
 }
