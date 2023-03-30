@@ -13,15 +13,20 @@ public class Path {
      * on each const with HAND on the name, the first int represents the index of that option in our two-dimensional
      * array, the second represents the cost to pass a plot with that item *when the heroes encounter a plot with a monster*
      */
-    private static final int[] EMPTY_HAND = {1, Integer.MAX_VALUE};
+    private static final int[] EMPTY_HAND = {1, 0};
     private static final int[] HARP_HAND = {2, 4};
     private static final int[] POTION_HAND = {3, 5};
     private static final int[] CLOAK_HAND = {4, 6};
 
+    private static final int DOG = 4;
+    private static final int TROLL = 5;
+    private static final int DRAGON = 6;
+
+
     private static final int maxValue = Integer.MAX_VALUE;
 
-    private int numPath;
-    private ArrayList<Integer> testResults;
+    private final int numPath;
+    private final ArrayList<Integer> testResults;
 
     /**
      * This is the constructor of the Path class, which initializes the numPath attribute
@@ -61,7 +66,7 @@ public class Path {
             String route = in.readLine();
             int n = route.length();
             int[][] dp = new int[5][n + 1];
-            fillDP(dp);
+
             calculateResults(route, n, dp);
             testResults.add(getMinTime(dp, n));
         }
@@ -87,17 +92,17 @@ public class Path {
                 // Handle the current plot based on its type
                 switch (currPlot) {
                     // empty Easy-plot
-                    case 'e':
+                    case 'e' -> {
                         // Update the dynamic programming table for an empty hand
                         updateEmptyHandDP(dp, i);
                         // Update the dynamic programming table for each item the player could be holding
                         updateDP(dp, HARP_HAND[0], i);
                         updateDP(dp, POTION_HAND[0], i);
                         updateDP(dp, CLOAK_HAND[0], i);
-                        break;
+                    }
 
                     //Easy-plot with harp
-                    case 'h':
+                    case 'h' -> {
                         // Update the dynamic programming table for an empty hand
                         updateEmptyHandDP(dp, i);
                         // Update the dynamic programming table for a matching harp in the hand
@@ -105,10 +110,10 @@ public class Path {
                         // Update the dynamic programming table for each item the player could be holding
                         updateDP(dp, POTION_HAND[0], i);
                         updateDP(dp, CLOAK_HAND[0], i);
-                        break;
+                    }
 
                     //Easy-plot with potion
-                    case 'p':
+                    case 'p' -> {
                         // Update the dynamic programming table for an empty hand
                         updateEmptyHandDP(dp, i);
                         // Update the dynamic programming table for a matching potion in the hand
@@ -116,10 +121,10 @@ public class Path {
                         // Update the dynamic programming table for each item the player could be holding
                         updateDP(dp, HARP_HAND[0], i);
                         updateDP(dp, CLOAK_HAND[0], i);
-                        break;
+                    }
 
                     //Easy-plot with cloak
-                    case 'c':
+                    case 'c' -> {
                         // Update the dynamic programming table for an empty hand
                         updateEmptyHandDP(dp, i);
                         // Update the dynamic programming table for a matching cloak in the hand
@@ -127,27 +132,19 @@ public class Path {
                         // Update the dynamic programming table for each item the player could be holding
                         updateDP(dp, HARP_HAND[0], i);
                         updateDP(dp, POTION_HAND[0], i);
-                        break;
+                    }
 
-                    //Monster plot with a three-headed dog (every item works against this monster)
-                    case '3':
-                        if (j == HARP_HAND[0]) updateMonsterDP(dp, HARP_HAND, i);
-                        else if (j == POTION_HAND[0]) updateMonsterDP(dp, POTION_HAND, i);
-                        else if (j == CLOAK_HAND[0]) updateMonsterDP(dp, CLOAK_HAND, i);
-                        break;
-                    //Monster plot with a Troll (potion and cloak works against this monster)
-                    case 't':
-                        if (j == POTION_HAND[0]) updateMonsterDP(dp, POTION_HAND, i);
-                        else if (j == CLOAK_HAND[0]) updateMonsterDP(dp, CLOAK_HAND, i);
-                        break;
+                    //Monster plot with a three-headed dog
+                    case '3' -> passMonster(j, i, dp, DOG);
 
-                    //Monster plot with a dragon (only Cloak works against this monster)
-                    case 'd':
-                        if (j == CLOAK_HAND[0]) updateMonsterDP(dp, CLOAK_HAND, i);
-                        break;
+                    //Monster plot with a Troll
+                    case 't' -> passMonster(j, i, dp, TROLL);
 
-                    default:
-                        break;
+
+                    //Monster plot with a dragon
+                    case 'd' -> passMonster(j, i, dp, DRAGON);
+                    default -> {
+                    }
                 }
             }
         }
@@ -181,6 +178,8 @@ public class Path {
     private void updateDP(int[][] dp, int object, int index) {
         if (dp[object][index - 1] != maxValue && dp[object][index - 1] != 0)
             dp[object][index] = dp[object][index - 1] + 3;
+        else
+            dp[object][index] = maxValue;
     }
 
 
@@ -206,9 +205,12 @@ public class Path {
      * @param object index of the object that the heroes may have in hand
      * @param index  the index of the column
      */
-    private void updateMonsterDP(int[][] dp, int[] object, int index) {
-        if (dp[object[0]][index - 1] != maxValue)
+    private void updateMonsterDP(int[][] dp, int[] object, int index, int monster) {
+        if (dp[object[0]][index - 1] != maxValue && object[1] >= monster)
             dp[object[0]][index] = dp[object[0]][index - 1] + object[1];
+        else
+            dp[object[0]][index] = maxValue;
+
     }
 
     /**
@@ -230,19 +232,18 @@ public class Path {
     }
 
     /**
-     * Fills the first column and first row with zeros and the rest of the 2d integer array with the max value possible.
+     * This method updates the 2D integer array dp with the cost value of passing a specific monster,
+     * based on the item the player has in hand, characterized by the int j.
      *
-     * @param dp a two-dimensional integer array representing the dynamic programming table
+     * @param j       the index of the item in the player's hand
+     * @param index   the index of the column to search for the minimum value
+     * @param dp      a two-dimensional integer array representing the dynamic programming table
+     * @param monster the cost it takes to pass the monster
      */
-    private void fillDP(int[][] dp) {
-        Arrays.fill(dp[0], 0);
-        for (int i = 0; i < dp.length; i++) {
-            dp[i][0] = 0;
-        }
-        for (int i = 1; i < dp.length; i++) {
-            for (int j = 1; j < dp[i].length; j++) {
-                dp[i][j] = maxValue;
-            }
-        }
+    private void passMonster(int j, int index, int[][] dp, int monster) {
+        if (j == EMPTY_HAND[0]) updateMonsterDP(dp, EMPTY_HAND, index, monster);
+        else if (j == HARP_HAND[0]) updateMonsterDP(dp, HARP_HAND, index, monster);
+        else if (j == POTION_HAND[0]) updateMonsterDP(dp, POTION_HAND, index, monster);
+        else if (j == CLOAK_HAND[0]) updateMonsterDP(dp, CLOAK_HAND, index, monster);
     }
 }
