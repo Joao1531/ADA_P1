@@ -4,29 +4,20 @@ import java.util.ArrayList;
 import java.util.Arrays;
 
 public class Path {
-    private static int[] EMPTY_HAND = {0, 0};
-    private static int[] HARP_HAND = {1, 4};
-    private static int[] POTION_HAND = {2, 5};
-    private static int[] CLOAK_HAND = {3, 6};
-
-    private static int[] CACHE;
-
-
+    private static final int[] EMPTY_HAND = {0, 0};
+    private static final int[] HARP_HAND = {1, 4};
+    private static final int[] POTION_HAND = {2, 5};
+    private static final int[] CLOAK_HAND = {3, 6};
     private static final int DOG = 4;
     private static final int TROLL = 5;
     private static final int DRAGON = 6;
     private static final int maxValue = Integer.MAX_VALUE;
-
-    private static int minValue;
-
-
     private final int numPaths;
-
     private final ArrayList<Integer> testResults;
 
     public Path(int numPaths) {
         this.numPaths = numPaths;
-        testResults = new ArrayList<Integer>(numPaths);
+        testResults = new ArrayList<>(numPaths);
     }
 
     public ArrayList<Integer> getTestResults() {
@@ -36,17 +27,14 @@ public class Path {
     public void fillTestResults(BufferedReader in) throws IOException {
         for (int i = 0; i < numPaths; i++) {
             String route = in.readLine();
-            int[][] dp = new int[4][1];
-            CACHE = new int[]{0, 0, 0, 0};
-            minValue = 0;
+            int[][] dp = new int[4][2];
             calculateResults(route, dp);
-
-            testResults.add(minValue);
+            testResults.add(getMinTime(dp));
 
         }
     }
 
-    public void calculateResults(String route, int[][] dp) {
+    private void calculateResults(String route, int[][] dp) {
         int strLength = route.length();
         for (int i = 0; i < strLength; i++) {
             char currPlot = route.charAt(i);
@@ -103,37 +91,34 @@ public class Path {
                 }
             }
         }
-        minValue = Arrays.stream(CACHE).min().getAsInt();
     }
 
-    public void updateEmptyHand(int[][] dp) {
-        if (CACHE[0] != maxValue) {
-            dp[EMPTY_HAND[0]][0] = CACHE[0] + 1;
+    private void updateEmptyHand(int[][] dp) {
+        int emptyHand = dp[0][0];
+        if (emptyHand != maxValue) {
+            dp[EMPTY_HAND[0]][1] = emptyHand + 1;
         } else {
-            minValue = Arrays.stream(CACHE).min().getAsInt();
-            dp[EMPTY_HAND[0]][0] = minValue + 2;
+            dp[EMPTY_HAND[0]][1] = getMinTime(dp) + 2;
         }
 
     }
 
-    public void updateDP(int[][] dp, int[] object) {
+    private void updateDP(int[][] dp, int[] object) {
+        int previousValue = dp[object[0]][0];
         for (int i = 1; i < dp.length; i++) {
-            if (dp[object[0]][0] != 0 && dp[object[0]][0] != maxValue) {
-                dp[object[0]][0] = CACHE[object[0]] + 3;
+            if (previousValue != 0 && previousValue != maxValue) {
+                dp[object[0]][1] = previousValue + 3;
             } else
-                dp[object[0]][0] = maxValue;
+                dp[object[0]][1] = maxValue;
         }
     }
 
     private void updateMatchingDP(int[][] dp, int[] object) {
-        //System.out.println(dp[EMPTY_HAND[0]][0]);
-        //System.out.println(minCol);
-        minValue = Arrays.stream(CACHE).min().getAsInt();
-        //System.out.println("MIN " + minValue);
-        if (CACHE[0] == minValue) {
-            dp[object[0]][0] = minValue + 2;
+        int firstValue = dp[0][0];
+        if (firstValue == getMinTime(dp)) {
+            dp[object[0]][1] = getMinTime(dp) + 2;
         } else {
-            dp[object[0]][0] = minValue + 3;
+            dp[object[0]][1] = getMinTime(dp) + 3;
         }
     }
 
@@ -147,18 +132,32 @@ public class Path {
     }
 
     private void updateMonsterDP(int[][] dp, int[] object, int monster) {
-        if (CACHE[object[0]] != maxValue && object[1] >= monster) {
-            dp[object[0]][0] = CACHE[object[0]] + object[1];
+        int previousValue = dp[object[0]][0];
+        if (previousValue!= maxValue && object[1] >= monster) {
+            dp[object[0]][1] = previousValue + object[1];
         } else
-            dp[object[0]][0] = maxValue;
+            dp[object[0]][1] = maxValue;
 
     }
 
     private void updateCache(int[][] dp) {
-        for (int i = 0; i < dp.length; i++)
-            CACHE[i] = dp[i][0];
-
+        for (int i = 0; i < dp.length; i++) {
+            dp[i][0] = dp[i][1];
+            dp[i][1] = 0;
+        }
     }
+
+    private int getMinTime(int[][]dp){
+        int minTime = dp[0][0];
+        for (int i = 1; i < dp.length; i++) {
+            if (dp[i][0] < minTime) {
+                minTime = dp[i][0];
+            }
+        }
+        return minTime;
+    }
+
+
 
 
 }

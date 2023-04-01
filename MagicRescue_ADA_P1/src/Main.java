@@ -4,19 +4,21 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 
 public class Main {
-    //private static int[] test = {1,0};
     public static void main(String[] args) throws IOException {
 
-        BufferedReader in = new BufferedReader(new InputStreamReader(System.in));
-        int numPaths = Integer.parseInt(in.readLine());
+        BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+        int numPaths = Integer.parseInt(input.readLine());
         Path path = new Path(numPaths);
-        path.fillTestResults(in);
+        path.fillTestResults(input);
         ArrayList<Integer> results = path.getTestResults();
+        printResults(results);
+        input.close();
+
+    }
+    private static void printResults(ArrayList<Integer> results){
         for (int minValue : results) {
             System.out.println(minValue);
         }
-        in.close();
-
     }
 
 }
