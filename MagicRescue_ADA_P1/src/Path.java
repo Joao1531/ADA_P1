@@ -163,12 +163,10 @@ public class Path {
      */
     private void updateDP(int[][] dp, int[] object) {
         int previousValue = dp[object[0]][0];
-        for (int i = 1; i < dp.length; i++) {
             if (previousValue != 0 && previousValue != maxValue) {
                 dp[object[0]][1] = previousValue + 3;
             } else
                 dp[object[0]][1] = maxValue;
-        }
     }
 
     /**
